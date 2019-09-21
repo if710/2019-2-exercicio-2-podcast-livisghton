@@ -6,7 +6,6 @@ import org.xmlpull.v1.XmlPullParserFactory
 
 import java.io.IOException
 import java.io.StringReader
-import java.util.ArrayList
 
 object Parser {
 
@@ -99,7 +98,10 @@ object Parser {
         var link: String? = null
         var pubDate: String? = null
         var description: String? = null
+        var downloadLink: String? = null
+
         parser.require(XmlPullParser.START_TAG, null, "item")
+
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
@@ -113,11 +115,15 @@ object Parser {
                 pubDate = readData(parser, "pubDate")
             } else if (name == "description") {
                 description = readData(parser, "description")
-            } else {
+            }
+            else if(name == "enclosure"){
+                downloadLink = parser.getAttributeValue(null, "url")
+            }
+            else {
                 skip(parser)
             }
         }
-        return ItemFeed(title!!, link!!, pubDate!!, description!!, "carregar o link")
+        return ItemFeed(title!!, link!!, pubDate!!, description!!, downloadLink!!)
     }
 
     // Processa tags de forma parametrizada no feed.
